@@ -1,0 +1,81 @@
+# Пример настройки cron для автоматического запуска Gazeta
+#
+# Использование:
+# 1. Скопируйте нужные строки
+# 2. Замените /path/to/gazeta на реальный путь к проекту
+# 3. Откройте crontab: crontab -e
+# 4. Вставьте и сохраните
+#
+# Формат cron:
+# ┌───────────── минута (0 - 59)
+# │ ┌───────────── час (0 - 23)
+# │ │ ┌───────────── день месяца (1 - 31)
+# │ │ │ ┌───────────── месяц (1 - 12)
+# │ │ │ │ ┌───────────── день недели (0 - 6) (0 = воскресенье)
+# │ │ │ │ │
+# * * * * * команда для выполнения
+
+# ========================================
+# ОСНОВНЫЕ ВАРИАНТЫ
+# ========================================
+
+# Каждый день в 9:00 (рекомендуется)
+0 9 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# Каждый день в 10:00 (если нужно позже)
+0 10 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# ========================================
+# ДОПОЛНИТЕЛЬНЫЕ ВАРИАНТЫ
+# ========================================
+
+# Два раза в день: в 9:00 и 21:00
+0 9,21 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# Только по рабочим дням (пн-пт) в 9:00
+0 9 * * 1-5 cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# Каждый час (для очень активных чатов)
+0 * * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# Каждые 6 часов (4 раза в день: 0:00, 6:00, 12:00, 18:00)
+0 */6 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# ========================================
+# С EMAIL УВЕДОМЛЕНИЯМИ
+# ========================================
+
+# Уведомления на email при ошибках (требуется настроенный mail)
+MAILTO=your.email@example.com
+0 9 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py run >> /path/to/gazeta/logs/cron.log 2>&1
+
+# ========================================
+# ДОПОЛНИТЕЛЬНЫЕ ЗАДАЧИ
+# ========================================
+
+# Очистка старых логов (каждую неделю в воскресенье в 3:00)
+0 3 * * 0 find /path/to/gazeta/logs -name "*.log" -mtime +30 -delete
+
+# Проверка подключений (каждый день в 8:55, перед основным запуском)
+55 8 * * * cd /path/to/gazeta && /path/to/gazeta/venv/bin/python main.py test >> /path/to/gazeta/logs/test.log 2>&1
+
+# ========================================
+# ПОЛЕЗНЫЕ КОМАНДЫ
+# ========================================
+
+# Посмотреть активные задачи:
+#   crontab -l
+
+# Редактировать crontab:
+#   crontab -e
+
+# Удалить все задачи:
+#   crontab -r
+
+# Посмотреть логи cron (зависит от системы):
+#   tail -f /var/log/cron
+#   tail -f /var/log/syslog | grep CRON
+#   journalctl -u cron -f
+
+# Посмотреть логи gazeta:
+#   tail -f /path/to/gazeta/logs/cron.log
